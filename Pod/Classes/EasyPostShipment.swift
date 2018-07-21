@@ -22,7 +22,7 @@ open class EasyPostShipment {
     open var fromAddress:EasyPostAddress?
     
     open var parcel:EasyPostParcel?
-    
+    open var trackerID:String?
     open var rates:[EasyPostRate] = []
     
     open var postageLabel:EasyPostLabel?
@@ -46,6 +46,8 @@ open class EasyPostShipment {
     
     public init(jsonDictionary: [String: Any]) {
         //Load the JSON dictionary
+        
+        print(jsonDictionary)
         
         let dateFormatter = DateFormatter()
         dateFormatter.timeZone = TimeZone(abbreviation: "GMT")
@@ -72,6 +74,7 @@ open class EasyPostShipment {
         }
         
         if let ratesArray = jsonDictionary["rates"] as? NSArray {
+            print(ratesArray, jsonDictionary["rates"])
             for rateElement in ratesArray {
                 if let rateDict = rateElement as? NSDictionary {
                     let rate = EasyPostRate(jsonDictionary: rateDict)
@@ -106,6 +109,11 @@ open class EasyPostShipment {
         
         if let rateDict = jsonDictionary["selected_rate"] as? NSDictionary {
             selectedRate = EasyPostRate(jsonDictionary: rateDict)
+        }
+        
+        if let tracker = jsonDictionary["tracker"] as? NSDictionary {
+            print(tracker["id"])
+            trackerID = tracker["id"] as? String
         }
         
         if let messagesArray = jsonDictionary["messages"] as? NSArray {

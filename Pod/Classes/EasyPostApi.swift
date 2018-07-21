@@ -248,6 +248,8 @@ open class EasyPostApi {
             switch result {
             case .success (let json):
                 if let resultDict = json as? [String: Any] {
+                    
+                    print(resultDict)
                     let shipment = EasyPostShipment(jsonDictionary: resultDict)
 
                     completion(EasyPostResult.success(shipment))
@@ -300,6 +302,33 @@ open class EasyPostApi {
         }
     }
     
+    open func getShipment(_ shipmentID : String?, completion: @escaping (_ result: EasyPostResult<EasyPostShipment>) -> ()) {
+        
+        if let shipmentID = shipmentID {
+            print(shipmentID)
+            guard let request = URLRequest.newRequest(urlString: apiBaseUrl + "shipment/" + shipmentID, method: .get, headers: getAuthHeader()) else {
+                return
+            }
+            print(request)
+            URLSession.newSession().apiDataTask(with: request) { (result) in
+                switch result {
+                case .success (let json):
+                    if let resultDict = json as? [String: Any] {
+                        let shipment = EasyPostShipment(jsonDictionary: resultDict)
+                        completion(EasyPostResult.success(shipment))
+                    } else {
+                        print("getShipments result was successful, but shipments array was not found.")
+                        completion(EasyPostResult.failure(NSError(domain: self.errorDomain, code: 5, userInfo: nil)))
+                    }
+                case .failure (let error):
+                    print(error)
+                    completion(EasyPostResult.failure(error))
+                    break
+                }
+            }
+        }
+    }
+    
     open func getShipments(onlyPurchased:Bool, pageSize:Int, beforeShipmentId:String?, completion: @escaping (_ result: EasyPostResult<[EasyPostShipment]>) -> ()) {
         
         var parameters:[String : String] = ["purchased" : onlyPurchased ? "true" : "false", "page_size" : String(pageSize)]
@@ -341,14 +370,37 @@ open class EasyPostApi {
             }
         }
     }
-    
+    open func getTracker(_ trackingID : String, completion: @escaping (_ result: EasyPostResult<EasyPostTracker>) -> ()) {
+        print(apiBaseUrl + "trackers/\(trackingID)")
+        guard let request = URLRequest.newRequest(urlString: apiBaseUrl + "trackers/\(trackingID)", method: .get, headers: getAuthHeader()) else {
+            return
+        }
+        
+        URLSession.newSession().apiDataTask(with: request) { (result) in
+            switch result {
+            case .success (let json):
+                if let resultDict = json as? [String: Any] {
+                    let tracker = EasyPostTracker(jsonDictionary: resultDict)
+                    
+                    completion(EasyPostResult.success(tracker))
+                } else {
+                    print("Result was successful, but blank.")
+                    completion(EasyPostResult.failure(NSError(domain: self.errorDomain, code: 2, userInfo: nil)))
+                }
+                break
+            case .failure (let error):
+                print(error)
+                completion(EasyPostResult.failure(error))
+                break
+            }
+        }
+    }
     open func labelForShipment(_ shipmentId:String, labelFormat:String, completion: @escaping (_ result: EasyPostResult<EasyPostShipment>) -> ()) {
         let parameters = ["file_format" : labelFormat]
 
         guard let request = URLRequest.newRequest(urlString: apiBaseUrl + "shipments/\(shipmentId)/label", method: .get, parameters: parameters, headers: getAuthHeader()) else {
             return
         }
-
         URLSession.newSession().apiDataTask(with: request) { (result) in
             switch result {
             case .success (let json):

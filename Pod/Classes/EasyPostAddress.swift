@@ -41,9 +41,13 @@ open class EasyPostAddress {
         
         if let stringValue = jsonDictionary["street1"] as? String {
             street1 = stringValue
+        } else if let stringValue = jsonDictionary["line1"] as? String {
+            street1 = stringValue
         }
         
         if let stringValue = jsonDictionary["street2"] as? String {
+            street2 = stringValue
+        } else if let stringValue = jsonDictionary["line2"] as? String {
             street2 = stringValue
         }
         
@@ -57,7 +61,10 @@ open class EasyPostAddress {
         
         if let stringValue = jsonDictionary["zip"] as? String {
             zip = stringValue
+        } else if let stringValue = jsonDictionary["postal_code"] as? String {
+            zip = stringValue
         }
+
         
         if let stringValue = jsonDictionary["country"] as? String {
             country = stringValue
