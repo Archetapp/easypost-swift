@@ -1,0 +1,51 @@
+//
+//  EasyPostBuyResponse.swift
+//  Pods
+//
+//  Created by William Welbes on 10/6/15.
+//
+//
+
+import Foundation
+
+open class EasyPostBuyResponse {
+    
+    open var postageLabel:EasyPostLabel?
+    
+    open var trackerID:String?
+    
+    open var trackingCode:String?
+    
+    open var selectedRate:EasyPostRate?
+    
+    public init() {
+        
+    }
+    
+    public init(jsonDictionary: [String: Any]) {
+        //Load the JSON dictionary
+        
+        print(jsonDictionary)
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeZone = TimeZone(abbreviation: "GMT")
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'"   //2013-04-22T05:40:57Z
+        
+        if let tracker = jsonDictionary["tracker"] as? NSDictionary {
+            trackerID = tracker["id"] as? String
+        }
+        
+        if let postageLabelDict = jsonDictionary["postage_label"] as? NSDictionary {
+            postageLabel = EasyPostLabel(jsonDictionary: postageLabelDict)
+        }
+        
+        if let stringValue = jsonDictionary["tracking_code"] as? String {
+            trackingCode = stringValue
+        }
+        
+        if let rateDict = jsonDictionary["selected_rate"] as? NSDictionary {
+            selectedRate = EasyPostRate(jsonDictionary: rateDict)
+        }
+        
+    }
+}
